@@ -39,7 +39,8 @@ def go_through(folder):
         path = f"{folder}/{content}"
         if os.path.isdir(path):
             go_through(path)
-        correct_file(path)
+        else:
+            correct_file(path)
 
 def correct_file(file_path):
     global error_count
