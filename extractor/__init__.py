@@ -8,67 +8,93 @@ parser = argparse.ArgumentParser()
 
 #-extract /User/some/directory/destination
 parser.add_argument("-e", "--extract", help="Full Directory Path e.g. '/Users/some/directory/destination'")
+parser.add_argument("-m", "--minimum", nargs='?', default="0mb", help="Minimum file size e.g. '2mb'")
 
 args = parser.parse_args()
 
+restore_folder = "restored"
+
+def minimum_size():
+    minimum = args.minimum.lower()
+    kb = 1042
+    mb = kb**2
+    gb = kb**3
+    tb = kb**4
+    if 'kb' in minimum:
+        minimum = minimum.split('kb')[0].strip()
+        size = int(minimum) * kb
+    elif 'mb' in minimum:
+        minimum = minimum.split('mb')[0].strip()
+        size = int(minimum) * mb
+    elif 'gb' in minimum:
+        minimum = minimum.split('gb')[0].strip()
+        size = int(minimum) * gb
+    elif 'tb' in minimum:
+        minimum = minimum.split('tb')[0].strip()
+        size = int(minimum) * tb
+    return size
+
+def go_through(folder):
+    for content in os.listdir(folder):
+        path = f"{folder}/{content}"
+        if os.path.isdir(path):
+            go_through(path)
+        correct_file(path)
+
+def correct_file(file_path):
+    global error_count
+    global restore_folder
+    if os.stat(file_path).st_size > minimum_size():
+        _file = os.path.basename(file_path)
+        _type = magic.from_file(file_path, mime=True)
+        # _types: image/png
+        extension = _type.split('/')[1]
+        corrected_file = f"{_file}.{extension}"
+        # corrected_file: file.ext
+        # copyfile(src, dst)
+        new_file = f"{restore_folder}/{corrected_file}"
+        # new_file: restored/file.ext
+        print(f"{_file} has been restored to {corrected_file}")
+        try:
+            copyfile(file_path, new_file)
+        except Exception as e:
+            print(e)
+            error_count+=1
+            pass
+    return True
+
 def extract():
-    print('Intializing restore.....')
+    global restore_folder
+    print('Intializing restore..')
     error_count = 0
-    extracted = "restored"
-    print('creating restore folder.....')
+    print('creating restore folder..')
     try:
-        os.makedirs(extracted)
+        os.makedirs(restore_folder)
     except:
-        print(f'{extracted} folder found')
+        print(f'{restore_folder} folder found')
         pass
-    backup_folder = args.extract
+    main_folder = args.extract
     '''
-    itunes backup folder looks like this:
+    initial folder assumption:
     
-    backup_folder/
-                folder/
-                    file, file, file
-                folder/
-                    file, file, file
-                folder/
-                    file, file, file
+    main_folder/
+                -folder/
+                    -file
+                -file
     '''
-    if backup_folder:
-        print('Checking backup folder.....')
-        for folder in os.listdir(backup_folder):
+    if main_folder:
+        print(f'Checking {main_folder}..')
+        for content in os.listdir(main_folder):
             '''
-            get a list of everything in the backup_folder
-            and identify directories
+            get a list of everything in the main_folder
+            and identify directories and files but ignore hidden files
             '''
-            path = f"{backup_folder}/{folder}"
-            print(f"Found {path}")
-            if os.path.isdir(path):
-                print(f"Looking for files from {path}")
-                '''
-                go through all files in the folder
-                '''
-                for _file in os.listdir(path):
-                    '''
-                    ignore if hidden files
-                    '''
-                    file_path = f"{path}/{_file}"
-                    if not _file.startswith('.') and not os.path.isdir(file_path):
-                        print(f"Found {_file}")
-                        _type = magic.from_file(file_path, mime=True)
-                        # _types: (image/png, None)
-                        extension = _type.split('/')[1]
-                        corrected_file = f"{_file}.{extension}"
-                        # corrected_file: file.ext
-                        # copyfile(src, dst)
-                        new_file = f"{extracted}/{corrected_file}"
-                        # new_file: restored/file.ext
-                        print(f"{_file} has been restored to {corrected_file}")
-                        try:
-                            copyfile(file_path, new_file)
-                        except Exception as e:
-                            print(e)
-                            error_count+=1
-                            pass
+            if not content.startswith('.'):
+                path = f"{main_folder}/{content}"
+                if os.path.isdir(path):
+                    go_through(path)
+                else:
+                    correct_file(path)
     errors = f" However there were {error_count} errors encountered." if error_count else ""
-    report = f"Your files have been extracted and copied to the restored folder.{errors}" if backup_folder else "Ensure you pass proper backup folder location"
+    report = f"Your files have been extracted and copied to the {restore_folder} folder.{errors}" if main_folder else "Ensure you pass proper backup folder location"
     print(report)
