@@ -15,7 +15,7 @@ You need to install libmagic on your computer [check here](https://github.com/ah
 
 
 # FLAGS
-`-e --extract` directory destination, the folder you want to extract from that is.
+`-e --extract` directory destination, the folder you want to extract from that is.<br />
 `-m --minimum` minimum file size you want to extract, default is 0kb, all file sizes that is.
 
 
