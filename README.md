@@ -8,9 +8,9 @@ You need to install libmagic on your computer [check here](https://github.com/ah
 `pip install fixtractor`
 
 # USAGE
-`fixtractor -e some/directory/destination`
-`fixtractor --extract some/directory/destination`
-`fixtractor -e some/directory/destination -m 20mb`
+`fixtractor -e some/directory/destination`<br />
+`fixtractor --extract some/directory/destination`<br />
+`fixtractor -e some/directory/destination -m 20mb`<br />
 `fixtractor --extract some/directory/destination --minimum 20mb`
 
 
