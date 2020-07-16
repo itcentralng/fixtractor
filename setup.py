@@ -2,12 +2,12 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 setuptools.setup(
-     name='itunes_extractor',  
+     name='fixtractor',  
      version='0.1.0',
-     scripts=['itunes_extractor'] ,
+     scripts=['fixtractor'] ,
      author="Nasir Mustapha",
      author_email="nasir@mrteey.com",
-     description="A simple tool to help you extract files from your iTunes backup.",
+     description="A simple tool to help you extract files from backup folders or any kind of folders with files that can not be identified.",
      long_description=long_description,
      long_description_content_type="text/markdown",
      url="https://github.com/mrteey/flask-setup",
