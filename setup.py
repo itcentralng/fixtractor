@@ -3,7 +3,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 setuptools.setup(
      name='fixtractor',  
-     version='0.1.1',
+     version='0.1.2',
      scripts=['fixtractor'] ,
      author="Nasir Mustapha",
      author_email="nasir@mrteey.com",
