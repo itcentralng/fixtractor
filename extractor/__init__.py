@@ -13,6 +13,8 @@ parser.add_argument("-m", "--minimum", nargs='?', default="0mb", help="Minimum f
 args = parser.parse_args()
 
 restore_folder = "restored"
+error_count = 0
+success_count = 0
 
 def minimum_size():
     minimum = args.minimum.lower()
@@ -44,6 +46,7 @@ def go_through(folder):
 
 def correct_file(file_path):
     global error_count
+    global success_count
     global restore_folder
     if os.stat(file_path).st_size > minimum_size():
         _file = os.path.basename(file_path)
@@ -58,6 +61,7 @@ def correct_file(file_path):
         print(f"{_file} has been restored to {corrected_file}")
         try:
             copyfile(file_path, new_file)
+            success_count+=1
         except Exception as e:
             print(e)
             error_count+=1
@@ -67,7 +71,6 @@ def correct_file(file_path):
 def extract():
     global restore_folder
     print('Intializing restore..')
-    error_count = 0
     print('creating restore folder..')
     try:
         os.makedirs(restore_folder)
@@ -99,3 +102,4 @@ def extract():
     errors = f" However there were {error_count} errors encountered." if error_count else ""
     report = f"Your files have been extracted and copied to the {restore_folder} folder.{errors}" if main_folder else "Ensure you pass proper backup folder location"
     print(report)
+    return {'success':success_count, 'error':error_count}
